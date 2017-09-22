@@ -11,6 +11,7 @@ encoded in a 3 different ways:
     * `grammar_gap.pl` -- Using the gap threading version of the sampling meta-interpreter from sampledcg
 
 The latter two are untested since several years ago and probably don't work.
+The graph unification algorithm is based on code by Bob Carpenter.
 
 It requires the Prolog lexical databases which are available at
     https://code.soundsoftware.ac.uk/hg/plex
