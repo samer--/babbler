@@ -1,9 +1,9 @@
-/* 
+/*
 	natural language grammar (English)
    Different mechanism for gaps
 */
 
-:- module(grammar_gap, [ 
+:- module(grammar_gap, [
 		(--->)/2
 	,	(+-->)/2
 	,	mapgoal/2
@@ -27,7 +27,7 @@
 	,	being_type/1
 	,	modal_vform/2
 	,	gtype/3
-	
+
 	,	op(1200,xfx,--->)
 	,	op(1200,xfx,+-->)
 	]).
@@ -69,7 +69,7 @@ title ---> ss(6).
 title ---> np(_,_,_,accusative,_).
 title ---> vp(_,_,_,_,_,gerund).
 
-% -------- Sentence 
+% -------- Sentence
 
 ss ---> fac(s).
 ss ---> cs.
@@ -89,9 +89,9 @@ sfs ---> fac(s), fs.
 imp ---> vp(second,_,_,active,_,imperative), ex.
 
 % question
-qs ---> 
-	aux(P,M), 
-	np(P,M,G,nominative,A), 
+qs --->
+	aux(P,M),
+	np(P,M,G,nominative,A),
 	vp(P,M,G,A,_,bare), qm.
 
 whqs ---> [how], fac(qs).
@@ -100,10 +100,10 @@ whqs ---> [why], fac(qs).
 1 # s0 ---> whqs.
 2 # s0 ---> qs.
 3 # s0 ---> fac(imp).
-6 # s0 ---> fac(ss), fs. 
+6 # s0 ---> fac(ss), fs.
 
-aux(_,_) ---> #modal(W,_), [W]. 
-aux(P,M) ---> vb(emphatic,P,M,tensed(_),_). 
+aux(_,_) ---> #modal(W,_), [W].
+aux(P,M) ---> vb(emphatic,P,M,tensed(_),_).
 
 
 bio(Gen,Sur,Middles) --->
@@ -113,7 +113,7 @@ bio(Gen,Sur,Middles) --->
 	rep(2,fac(adj(_,_,_,_))>>cm),
 	fac(adj(_,_,_,_)).
 
-	
+
 % what question
 %  whnp, vp.
 % whnp, aux, np, vp.
@@ -125,7 +125,7 @@ vpargs([]) ---> [].
 vpargs([A|AX]) ---> A, vpargs(AX).
 
 
-% -------- Verb phrase  
+% -------- Verb phrase
 %
 % vp(Person,Multiplicity,Gender,Agency,VerbGroup,VerbForm).
 %
@@ -153,7 +153,7 @@ verb_adverb(past_part,tensed).
 
 % ------------ based on TO BE -------------------------------
 
-vp(Pers,Num,Gen,Agency,[being],VForm) ---> 
+vp(Pers,Num,Gen,Agency,[being],VForm) --->
 	vb(bv(Type),Pers,Num,VForm,Agency),
 	#verb_type(Type,[np(Pers,Num,Gen,nominative,Agency)|Args]),
 	({VForm=tensed(_)}->maybe([not])),
@@ -161,9 +161,9 @@ vp(Pers,Num,Gen,Agency,[being],VForm) --->
 
 % subject BEGINS/GOES/BEGAN/WENT/IS BEGINNING TO/IS GOING TO to verb_infinitive
 vp(Per,Num,Gen,Agency,[modal(infinitive,Class)|TD],VForm) --->
-	#multiplicity(Num), 
+	#multiplicity(Num),
 	maybe_adv(modal),
-	vb(modal(infinitive,Class),Per,Num,VForm,Agency), 
+	vb(modal(infinitive,Class),Per,Num,VForm,Agency),
 	{modal_vform(Class,VForm)},
 	vp(Per,Num,Gen,Agency,TD,infinitive),
 	{\+member(modal(infinitive,Class),TD)}.
@@ -171,9 +171,9 @@ vp(Per,Num,Gen,Agency,[modal(infinitive,Class)|TD],VForm) --->
 
 % --------- Compound Tense variations ---------------------------------------
 
-% EMPHATIC:  subject DOES/DID verb_infinitive 
+% EMPHATIC:  subject DOES/DID verb_infinitive
 vp(Per,Num,Gen,Agency,[emphatic|TD],tensed(T)) --->
-	#multiplicity(Num), 
+	#multiplicity(Num),
 	#vpseq(emphatic,NextVP),
 	vb(emphatic,Per,Num,tensed(T),_), maybe([not]),
 	vp(Per,Num,Gen,Agency,[NextVP|TD],bare).
@@ -181,20 +181,20 @@ vp(Per,Num,Gen,Agency,[emphatic|TD],tensed(T)) --->
 
 % MODAL: eg subject WILL/CAN verb_inifinitive
 vp(Per,Num,Gen,Agency,[modal|TD],tensed(_)) --->
-	#multiplicity(Num), 
-	#modal(W,_), [W], 
+	#multiplicity(Num),
+	#modal(W,_), [W],
 	vp(Per,Num,Gen,Agency,TD,bare).
 
-% PERFECT: subject HAS/HAD verb_past participle 
+% PERFECT: subject HAS/HAD verb_past participle
 vp(Per,Num,Gen,Agency,[perfect|TD],VForm) --->
 	dif(VForm,past_part), dif(VForm,gerund) \\
-	#multiplicity(Num), 
-	vb(perfect,Per,Num,VForm,_), 
+	#multiplicity(Num),
+	vb(perfect,Per,Num,VForm,_),
 	vp(Per,Num,Gen,Agency,TD,past_part).
 
 
 % PROGRESSIVE: subject IS gerund (eg is running)
-vp(Pers,Num,Gen,Agency,[progressive|TD],VForm) ---> 
+vp(Pers,Num,Gen,Agency,[progressive|TD],VForm) --->
 	dif(VForm,gerund) \\
 	vb(progressive,Pers,Num,VForm,_),
 	#vpseq(VForm,progressive,NextVP), {TD=[NextVP|_]},
@@ -204,11 +204,11 @@ vp(Pers,Num,Gen,Agency,[progressive|TD],VForm) --->
 % ---------------  Derived forms
 
 % imperative form
-7 # vp(Pers,Num,Gen,Agency,TD,imperative) ---> 
+7 # vp(Pers,Num,Gen,Agency,TD,imperative) --->
 	vp(Pers,Num,Gen,Agency,TD,bare),
-	{\+member(not(_),TD)}. 
+	{\+member(not(_),TD)}.
 
-1 # vp(Pers,Num,Gen,Agency,[not(V)|TD],imperative) ---> 
+1 # vp(Pers,Num,Gen,Agency,[not(V)|TD],imperative) --->
 	[do], vp(Pers,Num,Gen,Agency,[not(V)|TD],bare).
 
 % negation of verb
@@ -246,9 +246,9 @@ vb(perfect,P,N,infinitive,A) ---> [to], vb(perfect,P,N,bare,A).
 vb(modal(infinitive,C),P,N,infinitive,A) ---> [to], vb(modal(infinitive,C),P,N,bare,A).
 
 
-% standard verb form pattern 
+% standard verb form pattern
 
-vb(C,P,N,bare,A) ---> dif(C,progressive) \\   		
+vb(C,P,N,bare,A) ---> dif(C,progressive) \\
 	#verb(C,A,W,_), #person(P), #multiplicity(N), [W].
 
 vb(C,P,N,past_part,A) ---> dif(C,progressive) \\
@@ -256,26 +256,26 @@ vb(C,P,N,past_part,A) ---> dif(C,progressive) \\
 	#person(P), #multiplicity(N), [W].
 
 
-vb(C,P,N,gerund,A) 	\\ dif(C,progressive) --->       
+vb(C,P,N,gerund,A) 	\\ dif(C,progressive) --->
 	#verb(C,A,R,Mo), {verb_morph(Mo,R,_,_,W,_)},
 	#person(P), #multiplicity(N), [W].
 
-vb(C,P,N,tensed(past),A)	\\ dif(C,progressive) ---> 
+vb(C,P,N,tensed(past),A)	\\ dif(C,progressive) --->
 	#verb(C,A,R,Mo), {verb_morph(Mo,R,_,W,_,_)},
 	#person(P), #multiplicity(N), [W].
 
-vb(C,P,N,tensed(present),A) \\ dif(C,progressive) ---> 
+vb(C,P,N,tensed(present),A) \\ dif(C,progressive) --->
 	#verb(C,A,R,Mo), {verb_morph(Mo,R,V,_,_,_)},
 	#person(P), #multiplicity(N),
 	( {P/N=third/singular} -> [V]; [R]).
 
 
 % forms fo the verb to be
-0.0625 # vb(progressive,P,N,VForm,A) ---> 
-	#agency(A), #person(P), #multiplicity(N), 
-	being_inflection(P,N,VForm). 
+0.0625 # vb(progressive,P,N,VForm,A) --->
+	#agency(A), #person(P), #multiplicity(N),
+	being_inflection(P,N,VForm).
 
-0.0625 # vb(bv(Type),P,N,VForm,A) ---> 
+0.0625 # vb(bv(Type),P,N,VForm,A) --->
 	#agency(A), #person(P), #multiplicity(N), #being_type(Type),
 	being_inflection(P,N,VForm).
 
@@ -295,13 +295,13 @@ being_inflection(_,_,bare)       ---> [be].
 being_inflection(_,_,gerund)     ---> [being].
 being_inflection(_,_,past_part)  ---> [been].
 being_inflection(P,N,tensed(present)) --->
-	{ P/N=first/singular -> W=am 
+	{ P/N=first/singular -> W=am
 	; P/N=third/singular -> W=is
 	; W=are
 	}, [W].
 
-being_inflection(P,N,tensed(past)) ---> 
-	{	P/N=first/singular -> W=was 
+being_inflection(P,N,tensed(past)) --->
+	{	P/N=first/singular -> W=was
 	;	P/N=third/singular -> W=was
 	;	W=were
 	}, [W].
@@ -345,13 +345,13 @@ possessive(N) ---> #pname(_,N), {atom_concat(N,'\'s',W)}, [W].
 
 % superlative phrase
 2 # sp(M,A,In) ---> #adj(M,A,W,normal(_)), {\+member(W,In)}, superlative(W).
-1 # sp(M,A,In) +--> #adj(M,A,W,normal(_)), {\+member(W,In)}, superlative(W), 
+1 # sp(M,A,In) +--> #adj(M,A,W,normal(_)), {\+member(W,In)}, superlative(W),
 	[','], sp(M,A,[W|In]).
 
 
 % -------- Nominals
 
- maprule( nn(_,_,_), nn(_,_,_)). 
+ maprule( nn(_,_,_), nn(_,_,_)).
 
 % !! could freeze computation of gender until needed
 nn(discrete(singular),G,A) ---> [S], #noun(GT,A,S,_), #gtype(singular,GT,G).
@@ -377,7 +377,7 @@ gtype(plural,either,male).
 gtype(plural,either,female).
 gtype(plural,either,mixed).
 
-% -------- Noun phrase  
+% -------- Noun phrase
 
 
 pron(P,M,G,C) ---> #nform(C), #pron(P,M,G,C,W), [W].
@@ -390,8 +390,8 @@ pron(P,M,G,C) ---> #nform(C), #pron(P,M,G,C,W), [W].
 5 # np(third,M,G,F,A) ---> #nform(F), #multiplicity(M), nnp(discrete(M),G,A).
 3 # np(third,singular,G,F,A) ---> #nform(F), nnp(continuous,G,A).
 1 # np(third,singular,_,NF,A) ---> #nform(NF), qp(NF,A).
-3 # np(third,singular,G,NF,active) --->   
-	#nform(NF), #pname(G,Name), 
+3 # np(third,singular,G,NF,active) --->
+	#nform(NF), #pname(G,Name),
 	ap(proper,discrete(singular),active), [Name].
 
 2 # np(P,N,G,_,A) ---> fills(np(P,N,G,_,A),[]).
@@ -439,7 +439,7 @@ pron(first,plural,_,reflexive,     ourselves).
 pron(second,plural,_,reflexive,    yourselves).
 pron(third,plural,_,reflexive,     themselves).
 
-% Noun phrases including possible reflexive nouns 
+% Noun phrases including possible reflexive nouns
 % that agree with subject of verb
 	maprule(object(P,_,_,A,_,_,_,_),object(P,_,_,A,_,_,_,_)).
 9 # object(_,_,_,_,P,N,G,A) ---> np(P,N,G,accusative,A).
@@ -474,14 +474,14 @@ apx(M,A,Adj1-T) +--> adj(M,A,Adj1,Adj2), adj_comma(T), apx(M,A,Adj2-T).
 cp(P,M,G,A) ---> #adj(_,A,D,normal(_)), comparative(D), [than], object(P,M,G,A,_,M,G,A).
 
 % -------- Relative clause
-rel(P,M,G,A) ---> 
-	rel_comma(C), 
-	wh(nominative,A), 
-	vp(P,M,G,A,_,tensed(_)), % GAP? 
+rel(P,M,G,A) --->
+	rel_comma(C),
+	wh(nominative,A),
+	vp(P,M,G,A,_,tensed(_)), % GAP?
 	rel_comma(C).
 
-rel(P,M,G,A) ---> 
-	rel_comma(C), 
+rel(P,M,G,A) --->
+	rel_comma(C),
 	fills(wh(accusative,A),np(P,M,G,_,A)), s(_), % GAP
 	rel_comma(C).
 
@@ -491,13 +491,13 @@ rel(P,M,G,A) --->
  maprule( adj(_,_,_,_), adj(_,_,_,_)).
 
 adj(M,A,In,Out) ---> #agency(A), adj(M,A,In,Out,[]).
-adj(M,A,In,[W:Mods|In],Mods) ---> [W], #adj(M,A,W,normal(_)), check_adj(W:Mods,In). 
+adj(M,A,In,[W:Mods|In],Mods) ---> [W], #adj(M,A,W,normal(_)), check_adj(W:Mods,In).
 adj(M,A,In,Out,Mods) +--> mod(Mods,Mods2), adj(M,A,In,Out,Mods2).
-0.125 # adj(_,active,In,In,[]) ---> vb(v(wn(2)),_,_,gerund,active). 
+0.125 # adj(_,active,In,In,[]) ---> vb(v(wn(2)),_,_,gerund,active).
 
 % adjective modifier
  maprule( mod(_,_), mod(_,_)).
-mod(In,[Mod|In]) ---> #mod(Mod), {check_mod(Mod,In)}, [Mod]. 
+mod(In,[Mod|In]) ---> #mod(Mod), {check_mod(Mod,In)}, [Mod].
 
 % allow/disallow particular chains of adjectives
 %% small prob of allowing double adjective
@@ -511,15 +511,15 @@ check_mod(very,[very|_]). % allowed to repeat very
 check_mod(slightly,[very|_]). % allowed to follow very with slightly
 
 
-comparative(A)  ---> 
-	{adj(_,_,A,normal(Rel))}, 
-	(	{Rel=rel(B,_)} -> [B] 
+comparative(A)  --->
+	{adj(_,_,A,normal(Rel))},
+	(	{Rel=rel(B,_)} -> [B]
 	;	{Rel=prefix}   -> [more,A]
 	).
 
-superlative(A)  ---> 
-	{adj(_,_,A,normal(Rel))}, 
-	(	{Rel=rel(_,B)} -> [B] 
+superlative(A)  --->
+	{adj(_,_,A,normal(Rel))},
+	(	{Rel=rel(_,B)} -> [B]
 	;	{Rel=prefix}   -> [most,A]
 	).
 
@@ -565,7 +565,7 @@ gender(singular,neuter).
 gender(plural,mixed).
 gender(plural,G) :- gender(singular,G).
 
-	
+
 
 agency(active).
 agency(passive).
@@ -618,31 +618,6 @@ modal(might,future).
 % modal('mustn\'t',future).
 % modal('needn\'t',future).
 
-det(_,indefinite,some).
-det(_,indefinite,no).
-det(continuous,indefinite,all).
-det(discrete(plural),indefinite,all).
-
-det(continuous,definite,this).
-det(discrete(singular),definite,this).
-det(discrete(plural),definite,these).
-det(continuous,definite,that).
-det(discrete(singular),definite,that).
-det(discrete(plural),definite,those).
-
-det(discrete(singular),indefinite,a).
-det(discrete(singular),indefinite,another).
-det(discrete(singular),indefinite,every).
-det(discrete(singular),indefinite,one).
-
-det(_,definite,the).
-det(_,definite,my).
-det(_,definite,your).
-det(_,definite,his).
-det(_,definite,her).
-det(_,definite,our).
-det(_,definite,their).
-
 20 # det(A,B,C) ---> #det(A,B,C).
 det(discrete(plural),indefinite,Num) ---> #card(plural,Num).
 
@@ -676,7 +651,7 @@ quant(any,   	active, anybody).
 
 prep ---> [P], #prep(P).
 
-modal_vform(need,F) :- !, F\=gerund. 
-modal_vform(seem,F) :- !, F\=gerund. 
+modal_vform(need,F) :- !, F\=gerund.
+modal_vform(seem,F) :- !, F\=gerund.
 modal_vform(go,F)   :- !, F=gerund.
 modal_vform(_,_).
